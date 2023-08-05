@@ -41,12 +41,12 @@ then
 		then
 				install_options=2
 				echo "$os_type"
-				echo "   -Lite Version-   "
+				echo "  -Lite Version-   "
 		elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
 		then
 				install_options=3
 				echo "$os_type"
-				echo "   -GUI Version-   "
+				echo "  -GUI Version-   "
 		else
 				install_options=4
 				echo "$os_type"
