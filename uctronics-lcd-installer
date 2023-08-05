@@ -1,0 +1,57 @@
+#! /bin/bash
+
+#Directory Declarations
+start_dir=$PWD
+temp_dir=/tmp/downloads
+install_dir=/etc/uctronics
+scripts_dir=/usr/bin
+
+#Color Declarations
+std=`tput setaf 15`
+red=`tput setaf 9 bold`
+green=`tput setaf 10 bold`
+yellow=`tput setaf 11 bold`
+pink=`tput setaf 57`
+blue=`tput setaf 27 bold`
+
+#Main Script
+echo ""
+echo ""
+echo "${blue}      ////////////  ////////////  //////   ////////////  ////////////${std}"
+echo "${blue}     //                 //       //   //       //       //          ${std}"
+echo "${blue}    //                 //       //    //      //       //          ${std}"
+echo "${blue}   ////////////       //       /////////     //       ////////////${std}"
+echo "${blue}            //       //       //      //    //                 //${std}"
+echo "${blue}           //       //       //       //   //                 //${std}"
+echo "${blue}////////////       //       //        //  //       ////////////${std}"
+echo "UCTronics Status LCD Installer by Nightstalker"
+echo ""
+echo ""
+echo "${blue}Checking OS...${std}"
+os_type="$(grep -E '^(NAME)=' /etc/os-release)"
+os_type=${os_type#*=}
+
+if [[ "$os_type" == *"Kali"* ]]
+then
+		install_options=1
+		echo "$os_type"
+elif [[ "$os_type" == *"Raspbian"* ]]
+then
+		if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
+		then
+				install_options=2
+				echo "$os_type/Lite Version"
+		elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
+		then
+				install_options=3
+				echo "$os_type/GUI Version"
+		else
+				install_options=4
+				echo "$os_type"
+		fi
+else
+		echo ""
+		echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
+		sleep 1
+		exit 1
+fi
