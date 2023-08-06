@@ -257,8 +257,7 @@ else
 	echo "${blue}Enabling automatic Startup Script...${std}"
 	echo ""
 	echo "${blue}Adding necessary lines to ${RC_LOCAL} ...${std}"
-	sudo sed -i "20 i " $RC_LOCAL
-	sudo sed -i "21 i ./uctronics-lcd-startup &" $RC_LOCAL
+	sudo sed -i "19 i ./uctronics-lcd-startup &" $RC_LOCAL
 	echo ""
 	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
 	sleep 1
