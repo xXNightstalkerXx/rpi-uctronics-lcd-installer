@@ -204,8 +204,8 @@ echo "${blue}Setting up the I2C Interface ...${std}"
 echo ""
 echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${I2C_SETTING} and adding baudrate settings...${std}"
 echo "dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000"
-sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
-sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^#dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
 echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
 
 if ! [ -e $BLACKLIST ]
