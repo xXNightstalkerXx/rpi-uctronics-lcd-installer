@@ -1,13 +1,30 @@
 #! /bin/bash
 
-#Start Directory Declaration
+#General Directory Declarations
 START_DIR=$PWD
+INSTALL_DIR=/etc/uctronics
+UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
+UC_REPO_DIR=/etc/uctronics/SKU_RM0004
+UC_BAK_DIR=/etc/uctronics/backup
+SCRIPTS_DIR=/usr/bin
+CONFIG=/boot/config.txt
+CONFIG_BAK=/etc/uctronics/backup/config.txt.bak
+UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
+UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
+STARTUP=/usr/bin/uctronics-lcd-startup
+STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
+TEMP_DIR=/tmp/backup
 
 #URL Declarations
 UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
 INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
 INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
-SETTING=on
+
+#I2C Interface Setting
+I2C_SETTING=off
+
+#Crontab Input
+CRON="@reboot ${STARTUP}"
 
 #Color Declarations
 std=`tput setaf 15`
@@ -27,7 +44,7 @@ echo "${blue}   ////////////       //       /////////     //       ////////////$
 echo "${blue}            //       //       //      //    //                 //${std}"
 echo "${blue}           //       //       //       //   //                 //${std}"
 echo "${blue}////////////       //       //        //  //       ////////////${std}"
-echo "UCTronics Status LCD Installer by Nightstalker"
+echo "UCTronics Status LCD Uninstaller by Nightstalker"
 echo ""
 echo ""
 echo "${blue}Checking OS...${std}"
@@ -36,201 +53,290 @@ os_type=${os_type#*=}
 
 if [[ "$os_type" == *"Kali"* ]]
 then
-		install_options=1
-		echo ""
-		echo "$os_type"
+	INSTALL_OPTIONS=1
+	echo ""
+	echo "$os_type"
 elif [[ "$os_type" == *"Raspbian"* ]]
 then
-		if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
-		then
-				install_options=2
-				echo ""
-				echo "$os_type"
-				echo " Lite Version"
-		elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
-		then
-				install_options=3
-				echo ""
-				echo "$os_type"
-				echo " GUI Lite Version"
-		elif [[ $(cat /boot/issue.txt) == *"stage5"* ]]
-		then
-				install_options=3
-				echo ""
-				echo "$os_type"
-				echo " GUI Full Version"
-		else
-				install_options=2
-				echo ""
-				echo "$os_type"
-				echo " Unknown Raspbian"
-				echo " Using Lite Version Install Options!"
-		fi
-else
+	if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
+	then
+		INSTALL_OPTIONS=2
 		echo ""
-		echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
-		sleep 1
-		exit 1
+		echo "$os_type"
+		echo " Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage5"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Full Version"
+	else
+		INSTALL_OPTIONS=2
+		echo ""
+		echo "$os_type"
+		echo " Unknown Raspbian"
+		echo " Using Lite Version Uninstall Options!"
+	fi
+else
+	echo ""
+	echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
+	sleep 1
+	exit 1
 fi
 
-if [[ $install_options -eq 1 ]]
+if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/kalipi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
-elif [[ $install_options -eq 2 ]]
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/kalipi-blacklist.conf
+elif [[ $INSTALL_OPTIONS -eq 2 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
-elif [[ $install_options -eq 3 ]]
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+	RC_LOCAL=/etc/rc.local
+	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
+	
+elif [[ $INSTALL_OPTIONS -eq 3 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+	RC_LOCAL=/etc/rc.local
+	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
 fi
 
 echo ""
-echo "${blue}Operating System okay! Continuing the Installation!${std}"
+echo "${blue}Operating System okay! Continuing to Uninstall!${std}"
+sleep 1
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	echo ""
+	echo ""
+	echo "${blue}Reverting Changes for automatic startup...${std}"
+	echo ""
+	echo "${blue}Deleting lines in Crontab...${std}"
+	(sudo crontab -u root -l | grep -v "@reboot ./startup" ) | sudo crontab -u root -
+	echo ""
+	echo "${blue}Disabled the Startup Script! Continuing to Uninstall!${std}"
+	sleep 1
+else
+	echo ""
+	echo ""
+	echo "${blue}Reverting Changes for automatic startup...${std}"
+	echo ""
+	echo "${blue}Deleting lines in ${RC_LOCAL} ...${std}"
+	grep -v "./uctronics-lcd-startup &" $RC_LOCAL | sudo tee $RC_LOCAL
+	echo ""
+	echo "${blue}Disabled the Startup Script! Continuing to Uninstall!${std}"
+	sleep 1
+fi
+
+echo ""
+echo ""
+echo "${blue}Switching ${I2C_SETTING} the I2C Interface ...${std}"
+echo ""
+echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${I2C_SETTING} and deleting baudrate settings...${std}"
+echo "dtparam=i2c_arm=${I2C_SETTING}"
+sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING}/" $CONFIG
+echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
+sudo dtparam i2c_arm=$I2C_SETTING
+echo "${blue}Modprobing the I2C Interface...${std}"
+modprobe i2c-dev
+echo ""
+echo "${blue}I2C Interface disabled! Continuing to Uninstall!${std}"
 sleep 1
 
 echo ""
+echo ""
+echo "${blue}Disabling ON/OFF Switch support...${std}"
+echo ""
+echo "${blue}Deleting line at ${CONFIG} ...${std}"
+echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" 
+grep -v "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" $RC_LOCAL | sudo tee $CONFIG
+echo ""
+echo "${blue}ON/OFF Switch support disabled! Continuing to Uninstall!${std}"
+sleep 1
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	echo ""
+	echo ""
+	echo "${green}A Backup of ${CONFIG} was created during Installation.${std}"
+	echo "${green}Do you want to recover, safe or delete it?${std}"
+	echo ""
+	echo "1. Recover the Backup"
+	echo "2. Safe the Backup"
+	echo "3. Delete the Backup"
+
+	echo ""
+	read -p "${green}Enter a Number for an Option: ${std}" n
+
+	while [[ $n -lt 1 || $n -gt 3 ]]
+	do
+        echo ""
+        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
+        read -p "Enter a Number for an Option: " n;
+	done
+	
+	if [[ $n -eq 1 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to recover the Backup ${CONFIG_BAK}!${std}"
+		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
+		sudo mv $CONFIG_BAK $CONFIG
+		echo ""
+		echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
+		sleep 1
+	elif [[ $n -eq 2 ]]
+	then
+		echo ""
+		echo ""
+		echo "${green}You selected to safe the Backup ${CONFIG_BAK}!${std}"
+		echo "${green}Please enter the full path to a Directory where to safe it!${std}"
+		echo "${green}If the Directory doesn't exist the Backup will be safed at ${TEMP_DIR}!${std}"
+		echo ""
+		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
+
+		if [ -d "$n" ]
+		then
+			echo ""
+			echo "${blue}Directory exists! Moving the Backup file there...${std}"
+			n=$n"/config.txt"
+			sudo mv $CONFIG_BAK $n
+			echo ""
+			echo "${blue}Backup is safed at ${n}! Continuing to Uninstall!${std}"
+			sleep 1
+		else
+			echo "${red}Directory doesn't exist! Moving the Backup file to ${TEMP_DIR} ...${std}"
+			sudo mkdir -p $TEMP_DIR
+			n=$TEMP_DIR"/config.txt"
+			sudo mv $CONFIG_BAK $n
+			echo ""
+			echo "${blue}Backup is safed at ${n}! Continuing to Uninstall!${std}"
+			sleep 1
+		fi
+	elif [[ $n -eq 3 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to delete the Backup ${CONFIG_BAK}!${std}"
+		echo ""
+		echo "${blue}Backup will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
+		sleep 1
+	fi
+else
+	echo ""
+	echo ""
+	echo "${green}Backups of ${CONFIG} and ${RC_LOCAL} were created during Installation.${std}"
+	echo "${green}Do you want to recover, safe or delete them?${std}"
+	echo ""
+	echo "1. Recover the Backups"
+	echo "2. Safe the Backups"
+	echo "3. Delete the Backups"
+
+	echo ""
+	read -p "${green}Enter a Number for an Option: ${std}" n
+
+	while [[ $n -lt 1 || $n -gt 3 ]]
+	do
+        echo ""
+        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
+        read -p "Enter a Number for an Option: " n;
+	done
+	
+	if [[ $n -eq 1 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
+		sudo mv $CONFIG_BAK $CONFIG
+		echo "${blue}Deleting current ${RC_LOCAL} and moving the Backup from ${RC_LOCAL_BAK} there instead...${std}"
+		sudo mv $RC_LOCAL_BAK $RC_LOCAL
+		echo ""
+		echo "${blue}Backups recovered! Continuing to Uninstall!${std}"
+		sleep 1
+	elif [[ $n -eq 2 ]]
+	then
+		echo ""
+		echo ""
+		echo "${green}You selected to safe the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo "${green}Please enter the full path to a Directory where to safe them!${std}"
+		echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
+		echo ""
+		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
+
+		if [ -d "$n" ]
+		then
+			echo ""
+			echo "${blue}Directory exists! Moving the Backup files there...${std}"
+			config_temp=$n"/config.txt"
+			rc_local_temp=$n"/rc.local"
+			sudo mv $CONFIG_BAK $config_temp
+			sudo mv $RC_LOCAL_BAK $rc_local_temp
+			echo ""
+			echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
+			sleep 1
+		else
+			echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} ...${std}"
+			sudo mkdir -p $TEMP_DIR
+			config_temp=$TEMP_DIR"/config.txt"
+			rc_local_temp=$TEMP_DIR"/rc.local"
+			sudo mv $CONFIG_BAK $config_temp
+			sudo mv $RC_LOCAL_BAK $rc_local_temp
+			echo ""
+			echo "${blue}Backups are safed at $TEMP_DIR! Continuing to Uninstall!${std}"
+			sleep 1
+		fi
+	elif [[ $n -eq 3 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to delete the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo ""
+		echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
+		sleep 1
+	fi
+fi
+
+echo ""
+echo ""
+echo "${blue}Checking Directories...${std}"
 echo ""
 echo "${blue}Checking Installation Directory...${std}"
 echo "$INSTALL_DIR"
-
 if [ -d "$INSTALL_DIR" ]
 then
-    	echo "${red}Installation Directory exists. Not Creating this Directory!${std}"
+    echo "${blue}Installation Directory exists. Deleting this Directory!${std}"
+    sudo rm -d -r $INSTALL_DIR
 else
-    	echo "${blue}Installation Directory doesn't exist. Creating the Directory!${std}"
-		sudo mkdir -p $INSTALL_DIR
+    echo "${red}Installation Directory doesn't exist. Not able to delete!${std}"
 fi
-
 echo ""
-echo "${blue}Directories are okay! Continuing the Installation!${std}"
+echo "${blue}Directories sucessfully deleted! Continuing to Uninstall!${std}"
 sleep 1
 
 echo ""
 echo ""
-echo "${blue}Setting up the I2C Interface ...${std}"
+echo "${blue}Deleting Script Files in ${SCRIPTS_DIR} Directory...${std}"
 echo ""
-echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${SETTING} and adding baudrate settings...${std}"
-echo "dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000"
-sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
-sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
-echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
-
-if ! [ -e $BLACKLIST ]
-then
-		touch $BLACKLIST
-fi
-
-sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
-sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
-
-if ! grep -q "^i2c[-_]dev" /etc/modules
-then
-		printf "i2c-dev\n" >> /etc/modules
-fi
-
-echo "${blue}Switching the I2C dtparam to ${SETTING} ...${std}"
-dtparam i2c_arm=$SETTING
-echo "${blue}Modprobing the I2C Interface...${std}"
-modprobe i2c-dev
-
+echo "${blue}Switching into Directory...${std}"
+echo "$SCRIPTS_DIR"
+cd $SCRIPTS_DIR
+echo "${blue}Deleting uctronics-lcd-startup...${std}"
+sudo rm $STARTUP
 echo ""
-echo "${blue}I2C Interface Setup completed! Continuing the Installation!${std}"
+echo "${blue}Script Files removed from the System! Purging myself now!${std}"
 sleep 1
 
 echo ""
 echo ""
-echo "${blue}Enabling ON/OFF Switch support...${std}"
+echo "${blue}Uninstall completed, Good bye!${std}"
 echo ""
-echo "${blue}Adding necessary lines to ${CONFIG} ...${std}"
-echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a /boot/config.txt
-echo ""
-echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Enabling automatic Startup Script...${std}"
-echo ""
-echo "${blue}Adding necessary lines to ${STARTUP} ...${std}"
-sudo sed -i "19 i cd ${UC_REPO_DIR}" $STARTUP
-sudo sed -i "20 i make clean" $STARTUP
-sudo sed -i "21 i make" $STARTUP
-sudo sed -i "22 i ./display &" $STARTUP
-echo ""
-echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Installing the official UCTronics Repository...${std}"
-echo ""
-echo "${blue}Switching into the Installation Directory...${std}"
-echo "$INSTALL_DIR"
-cd $INSTALL_DIR
-echo "${blue}Downloading the UCTronics Repository...${std}"
-sudo git clone $UC_GIT_URL
-echo ""
-echo "${blue}Installation of the UCTronics Repository completed! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Installing the UCTRONICS-LCD-INSTALLER Repository...${std}"
-echo ""
-echo "${blue}Downloading the UCTRONICS-LCD-INSTALLER Repository...${std}"
-sudo git clone $INSTALLER_GIT_URL
-echo "${blue}Switching into the UCTRONICS-LCD-INSTALLER Directory...${std}"
-echo "$UC_INSTALLER_DIR"
-cd $UC_INSTALLER_DIR
-echo "${blue}Making the UCTRONICS-LCD-INSTALLER Scripts executable...${std}"
-sudo chmod 0755 uctronics-lcd-installer
-sudo chmod 0755 uctronics-lcd-uninstaller
-echo "${blue}Copying the uctronics-lcd-uninstaller Script into $SCRIPTS_DIR ...${std}"
-sudo cp uctronics-lcd-uninstaller /usr/bin
-echo ""
-echo "${blue}Installation of the UCTRONICS-LCD-INSTALLER Repository completed! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Cleaning up the Installation...${std}"
-echo ""
-echo "${blue}Checking if I'm executed within my GIT Directory...${std}"
-echo "$START_DIR"
-if [[ $START_DIR == *"uctronics-lcd-installer" ]]
-then
-		echo ""
-        echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
-		echo "${yellow}YOU WILL HAVE TO USE 'CD' AFTER I PURGED MY DIRECTORY!${std}"
-		echo ""
-		echo "${blue}Purging the Directory now...${std}"
-        echo "${blue}Installation Complete! Good Bye!${std}"
-		echo ""
-        sudo rm -d -r $START_DIR
-else
-        echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
-        echo ""
-        echo "${blue}Installation Complete! Good Bye!${std}"
-        sudo rm $START_DIR"/uctronics-lcd-installer"
-fi
+sudo rm $UNINSTALL
