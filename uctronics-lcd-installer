@@ -132,8 +132,8 @@ echo "${blue}Setting up the I2C Interface ...${std}"
 echo ""
 echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${SETTING} and adding baudrate settings...${std}"
 echo "dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000"
-sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
-sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
 echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
 
 if ! [ -e $BLACKLIST ]
@@ -141,8 +141,8 @@ then
 		touch $BLACKLIST
 fi
 
-sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
-sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
+sudo sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
+sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
 
 if ! grep -q "^i2c[-_]dev" /etc/modules
 then
@@ -150,7 +150,7 @@ then
 fi
 
 echo "${blue}Switching the I2C dtparam to ${SETTING} ...${std}"
-dtparam i2c_arm=$SETTING
+sudo dtparam i2c_arm=$SETTING
 echo "${blue}Modprobing the I2C Interface...${std}"
 modprobe i2c-dev
 
