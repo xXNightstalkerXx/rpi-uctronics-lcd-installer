@@ -5,6 +5,6 @@ START_DIR=$PWD
 UC_REPO_DIR=/etc/uctronics/SKU_RM0004
 
 cd $UC_REPO_DIR
-make clean
-make
+sudo make clean
+sudo make
 ./display
