@@ -37,7 +37,7 @@ The Installer does the rest of the Job for you now.
 # HOW TO USE
 
     uctronics-lcd-startup
-Will manuall activate the Startup Script and launch the Status LCD Display
+Will manually activate the Startup Script and launch the Status LCD Display
 
     uctronics-lcd-uninstaller
 Will revert all changes to rc.local and config.txt file and switch off I2C Interface.
