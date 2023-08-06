@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#Start Directory Declaration
+#General Directory Declarations
 START_DIR=$PWD
 INSTALL_DIR=/etc/uctronics
 UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
