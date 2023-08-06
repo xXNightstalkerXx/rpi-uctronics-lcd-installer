@@ -2,12 +2,29 @@
 
 #Start Directory Declaration
 START_DIR=$PWD
+INSTALL_DIR=/etc/uctronics
+UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
+UC_REPO_DIR=/etc/uctronics/SKU_RM0004
+UC_BAK_DIR=/etc/uctronics/backup
+SCRIPTS_DIR=/usr/bin
+CONFIG=/boot/config.txt
+CONFIG_BAK=/etc/uctronics/backup/config.txt.bak
+UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
+UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
+STARTUP=/usr/bin/uctronics-lcd-startup
+STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
 
 #URL Declarations
 UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
 INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
 INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
-SETTING=on
+
+#I2C Interface ON_SETTINGs
+ON_ON_SETTING=on
+OFF_ON_SETTING=off
+
+#Crontab Input
+CRON="@reboot ${STARTUP}"
 
 #Color Declarations
 std=`tput setaf 15`
@@ -36,73 +53,60 @@ os_type=${os_type#*=}
 
 if [[ "$os_type" == *"Kali"* ]]
 then
-		install_options=1
-		echo ""
-		echo "$os_type"
+	INSTALL_OPTIONS=1
+	echo ""
+	echo "$os_type"
 elif [[ "$os_type" == *"Raspbian"* ]]
 then
-		if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
-		then
-				install_options=2
-				echo ""
-				echo "$os_type"
-				echo " Lite Version"
-		elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
-		then
-				install_options=3
-				echo ""
-				echo "$os_type"
-				echo " GUI Lite Version"
-		elif [[ $(cat /boot/issue.txt) == *"stage5"* ]]
-		then
-				install_options=3
-				echo ""
-				echo "$os_type"
-				echo " GUI Full Version"
-		else
-				install_options=2
-				echo ""
-				echo "$os_type"
-				echo " Unknown Raspbian"
-				echo " Using Lite Version Install Options!"
-		fi
-else
+	if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
+	then
+		INSTALL_OPTIONS=2
 		echo ""
-		echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
-		sleep 1
-		exit 1
+		echo "$os_type"
+		echo " Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage5"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Full Version"
+	else
+		INSTALL_OPTIONS=2
+		echo ""
+		echo "$os_type"
+		echo " Unknown Raspbian"
+		echo " Using Lite Version Install Options!"
+	fi
+else
+	echo ""
+	echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
+	sleep 1
+	exit 1
 fi
 
-if [[ $install_options -eq 1 ]]
+if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/kalipi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
-elif [[ $install_options -eq 2 ]]
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/kalipi-blacklist.conf
+elif [[ $INSTALL_OPTIONS -eq 2 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
-elif [[ $install_options -eq 3 ]]
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+	RC_LOCAL=/etc/rc.local
+	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
+	
+elif [[ $INSTALL_OPTIONS -eq 3 ]]
 then
-		#Directory Declarations
-		INSTALL_DIR=/etc/uctronics
-		UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-		UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-		SCRIPTS_DIR=/usr/bin
-		BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-		CONFIG=/boot/config.txt
-		STARTUP=/etc/rc.local
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+	RC_LOCAL=/etc/rc.local
+	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
 fi
 
 echo ""
@@ -119,66 +123,22 @@ then
     	echo "${red}Installation Directory exists. Not Creating this Directory!${std}"
 else
     	echo "${blue}Installation Directory doesn't exist. Creating the Directory!${std}"
-		sudo mkdir -p $INSTALL_DIR
+	sudo mkdir -p $INSTALL_DIR
+fi
+
+echo "${blue}Checking Backup Directory...${std}"
+echo "$UC_BAK_DIR"
+
+if [ -d "$UC_BAK_DIR" ]
+then
+    	echo "${red}Backup Directory exists. Not Creating this Directory!${std}"
+else
+    	echo "${blue}Backup Directory doesn't exist. Creating the Directory!${std}"
+	sudo mkdir -p $UC_BAK_DIR
 fi
 
 echo ""
 echo "${blue}Directories are okay! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Setting up the I2C Interface ...${std}"
-echo ""
-echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${SETTING} and adding baudrate settings...${std}"
-echo "dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000"
-sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
-sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${SETTING},i2c_arm_baudrate=400000/" $CONFIG
-echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
-
-if ! [ -e $BLACKLIST ]
-then
-		touch $BLACKLIST
-fi
-
-sudo sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
-sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
-
-if ! grep -q "^i2c[-_]dev" /etc/modules
-then
-		printf "i2c-dev\n" >> /etc/modules
-fi
-
-echo "${blue}Switching the I2C dtparam to ${SETTING} ...${std}"
-sudo dtparam i2c_arm=$SETTING
-echo "${blue}Modprobing the I2C Interface...${std}"
-modprobe i2c-dev
-
-echo ""
-echo "${blue}I2C Interface Setup completed! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Enabling ON/OFF Switch support...${std}"
-echo ""
-echo "${blue}Adding necessary lines to ${CONFIG} ...${std}"
-echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a /boot/config.txt
-echo ""
-echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
-sleep 1
-
-echo ""
-echo ""
-echo "${blue}Enabling automatic Startup Script...${std}"
-echo ""
-echo "${blue}Adding necessary lines to ${STARTUP} ...${std}"
-sudo sed -i "19 i cd ${UC_REPO_DIR}" $STARTUP
-sudo sed -i "20 i make clean" $STARTUP
-sudo sed -i "21 i make" $STARTUP
-sudo sed -i "22 i ./display &" $STARTUP
-echo ""
-echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
 sleep 1
 
 echo ""
@@ -206,11 +166,104 @@ cd $UC_INSTALLER_DIR
 echo "${blue}Making the UCTRONICS-LCD-INSTALLER Scripts executable...${std}"
 sudo chmod 0755 uctronics-lcd-installer
 sudo chmod 0755 uctronics-lcd-uninstaller
+sudo chmod 0755 uctronics-lcd-startup
 echo "${blue}Copying the uctronics-lcd-uninstaller Script into $SCRIPTS_DIR ...${std}"
-sudo cp uctronics-lcd-uninstaller /usr/bin
-echo ""
+sudo cp $UNINSTALL_BAK $UNINSTALL
+echo "${blue}Copying the uctronics-lcd-startup Script into $SCRIPTS_DIR ...${std}"
+sudo cp $STARTUP_BAK $STARTUP
 echo "${blue}Installation of the UCTRONICS-LCD-INSTALLER Repository completed! Continuing the Installation!${std}"
 sleep 1
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	echo ""
+	echo ""
+	echo "${blue}Creating a Backup of ${CONFIG} ...${std}"
+	echo ""
+	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
+	sudo cp $CONFIG $CONFIG_BAK
+	echo ""
+	echo "${blue}Backup created! Continuing the Installation!${std}"
+	sleep 1
+else
+	echo ""
+	echo ""
+	echo "${blue}Creating Backups of ${CONFIG} and ${RC_LOCAL} ...${std}"
+	echo ""
+	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
+	sudo cp $CONFIG $CONFIG_BAK
+	echo "{blue}Copying ${RC_LOCAL} to ${RC_LOCAL_BAK} ...${std}"
+	sudo cp $RC_LOCAL $RC_LOCAL_BAK
+	echo ""
+	echo "${blue}Backups created! Continuing the Installation!${std}"
+	sleep 1
+fi
+
+echo ""
+echo ""
+echo "${blue}Setting up the I2C Interface ...${std}"
+echo ""
+echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${ON_SETTING} and adding baudrate settings...${std}"
+echo "dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000"
+sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
+
+if ! [ -e $BLACKLIST ]
+then
+	touch $BLACKLIST
+fi
+
+sudo sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
+sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
+
+if ! grep -q "^i2c[-_]dev" /etc/modules
+then
+	printf "i2c-dev\n" >> /etc/modules
+fi
+
+echo "${blue}Switching the I2C dtparam to ${ON_SETTING} ...${std}"
+sudo dtparam i2c_arm=$ON_SETTING
+echo "${blue}Modprobing the I2C Interface...${std}"
+modprobe i2c-dev
+
+echo ""
+echo "${blue}I2C Interface Setup completed! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Enabling ON/OFF Switch support...${std}"
+echo ""
+echo "${blue}Adding necessary lines at ${CONFIG} ...${std}"
+echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a $CONFIG
+echo ""
+echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
+sleep 1
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	echo ""
+	echo ""
+	echo "${blue}Enabling automatic Startup Script...${std}"
+	echo ""
+	echo "${blue}Adding necessary lines to Crontab...${std}"
+	(crontab -u sudo -l; echo "$CRON" ) | crontab -u sudo -
+	echo ""
+	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
+	sleep 1
+else
+	echo ""
+	echo ""
+	echo "${blue}Enabling automatic Startup Script...${std}"
+	echo ""
+	echo "${blue}Adding necessary lines to ${RC_LOCAL} ...${std}"
+	sudo sed -i "20 i " $RC_LOCAL
+	sudo sed -i "21 i ./uctronics-lcd-startup &" $RC_LOCAL
+	echo ""
+	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
+	sleep 1
+fi
 
 echo ""
 echo ""
@@ -220,17 +273,18 @@ echo "${blue}Checking if I'm executed within my GIT Directory...${std}"
 echo "$START_DIR"
 if [[ $START_DIR == *"uctronics-lcd-installer" ]]
 then
-		echo ""
-        echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
-		echo "${yellow}YOU WILL HAVE TO USE 'CD' AFTER I PURGED MY DIRECTORY!${std}"
-		echo ""
-		echo "${blue}Purging the Directory now...${std}"
-        echo "${blue}Installation Complete! Good Bye!${std}"
-		echo ""
-        sudo rm -d -r $START_DIR
+	echo ""
+    echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
+	echo "${yellow}YOU WILL HAVE TO USE 'CD' AFTER I PURGED MY DIRECTORY!${std}"
+	echo ""
+	echo "${blue}Purging the Directory now...${std}"
+    echo "${blue}Installation Complete! Good Bye!${std}"
+	echo ""
+    sudo rm -d -r $START_DIR
 else
-        echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
-        echo ""
-        echo "${blue}Installation Complete! Good Bye!${std}"
-        sudo rm $START_DIR"/uctronics-lcd-installer"
+    echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
+    echo ""
+    echo "${blue}Installation Complete! Good Bye!${std}"
+	echo ""
+    sudo rm $START_DIR"/uctronics-lcd-installer"
 fi
