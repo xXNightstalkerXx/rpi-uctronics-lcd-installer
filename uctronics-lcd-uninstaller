@@ -157,7 +157,7 @@ echo "${blue}Disabling ON/OFF Switch support...${std}"
 echo ""
 echo "${blue}Deleting line at ${CONFIG} ...${std}"
 echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" 
-grep -v "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" $RC_LOCAL | sudo tee $CONFIG
+grep -v "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" $CONFIG | sudo tee $CONFIG
 echo ""
 echo "${blue}ON/OFF Switch support disabled! Continuing to Uninstall!${std}"
 sleep 1
