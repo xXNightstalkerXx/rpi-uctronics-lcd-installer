@@ -191,7 +191,7 @@ else
 	echo ""
 	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
 	sudo cp $CONFIG $CONFIG_BAK
-	echo "{blue}Copying ${RC_LOCAL} to ${RC_LOCAL_BAK} ...${std}"
+	echo "${blue}Copying ${RC_LOCAL} to ${RC_LOCAL_BAK} ...${std}"
 	sudo cp $RC_LOCAL $RC_LOCAL_BAK
 	echo ""
 	echo "${blue}Backups created! Continuing the Installation!${std}"
