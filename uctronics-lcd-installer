@@ -247,7 +247,7 @@ then
 	echo "${blue}Enabling automatic Startup Script...${std}"
 	echo ""
 	echo "${blue}Adding necessary lines to Crontab...${std}"
-	(crontab -u sudo -l; echo "$CRON" ) | crontab -u sudo -
+	(crontab -u root -l; echo "$CRON" ) | crontab -u root -
 	echo ""
 	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
 	sleep 1
