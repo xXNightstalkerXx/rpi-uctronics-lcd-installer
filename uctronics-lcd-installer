@@ -274,17 +274,19 @@ echo "$START_DIR"
 if [[ $START_DIR == *"uctronics-lcd-installer" ]]
 then
 	echo ""
-    echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
+	echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
 	echo "${yellow}YOU WILL HAVE TO USE 'CD' AFTER I PURGED MY DIRECTORY!${std}"
+	echo "${red}Please reboot after the Installation!${std}"
 	echo ""
 	echo "${blue}Purging the Directory now...${std}"
-    echo "${blue}Installation Complete! Good Bye!${std}"
+    	echo "${blue}Installation Complete! Good Bye!${std}"
 	echo ""
-    sudo rm -d -r $START_DIR
+    	sudo rm -d -r $START_DIR
 else
-    echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
-    echo ""
-    echo "${blue}Installation Complete! Good Bye!${std}"
+    	echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
+    	echo ""
+	echo "${red}Please reboot after the Installation!${std}"
+    	echo "${blue}Installation Complete! Good Bye!${std}"
 	echo ""
-    sudo rm $START_DIR"/uctronics-lcd-installer"
+    	sudo rm $START_DIR"/uctronics-lcd-installer"
 fi
