@@ -20,8 +20,8 @@ INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.gi
 INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
 
 #I2C Interface ON_SETTINGs
-ON_ON_SETTING=on
-OFF_ON_SETTING=off
+ON_SETTING=on
+OFF_SETTING=off
 
 #Crontab Input
 CRON="@reboot ${STARTUP}"
