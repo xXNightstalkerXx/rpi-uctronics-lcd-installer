@@ -19,8 +19,8 @@ UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
 INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
 INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
 
-#I2C Interface ON_SETTINGs
-ON_SETTING=on
+#I2C Interface Setting
+I2C_SETTING=on
 
 #Crontab Input
 CRON="@reboot ${STARTUP}"
@@ -202,10 +202,10 @@ echo ""
 echo ""
 echo "${blue}Setting up the I2C Interface ...${std}"
 echo ""
-echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${ON_SETTING} and adding baudrate settings...${std}"
-echo "dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000"
-sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000/" $CONFIG
-sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${ON_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${I2C_SETTING} and adding baudrate settings...${std}"
+echo "dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000"
+sudo sed -i "s/^*dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^*#dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
 echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
 
 if ! [ -e $BLACKLIST ]
@@ -221,8 +221,8 @@ then
 	printf "i2c-dev\n" >> /etc/modules
 fi
 
-echo "${blue}Switching the I2C dtparam to ${ON_SETTING} ...${std}"
-sudo dtparam i2c_arm=$ON_SETTING
+echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
+sudo dtparam i2c_arm=$I2C_SETTING
 echo "${blue}Modprobing the I2C Interface...${std}"
 modprobe i2c-dev
 
