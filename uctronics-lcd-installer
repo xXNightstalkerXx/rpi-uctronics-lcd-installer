@@ -227,7 +227,7 @@ echo "${blue}Modprobing the I2C Interface...${std}"
 modprobe i2c-dev
 
 echo ""
-echo "${blue}I2C Interface Setup completed! Continuing the Installation!${std}"
+echo "${blue}I2C Interface Setup is completed! Continuing the Installation!${std}"
 sleep 1
 
 echo ""
