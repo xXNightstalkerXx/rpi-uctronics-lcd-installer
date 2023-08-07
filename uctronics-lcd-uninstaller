@@ -120,7 +120,7 @@ then
 	echo "${blue}Reverting Changes for automatic startup...${std}"
 	echo ""
 	echo "${blue}Deleting lines in Crontab...${std}"
-	(sudo crontab -u root -l | grep -v "@reboot ./startup" ) | sudo crontab -u root -
+	(sudo crontab -u root -l | grep -v "@reboot $STARTUP" ) | sudo crontab -u root -
 	echo ""
 	echo "${blue}Disabled the Startup Script! Continuing to Uninstall!${std}"
 	sleep 1
