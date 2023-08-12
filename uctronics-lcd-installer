@@ -9,6 +9,8 @@ UC_BAK_DIR=/etc/uctronics/backup
 SCRIPTS_DIR=/usr/bin
 CONFIG=/boot/config.txt
 CONFIG_BAK=/etc/uctronics/backup/config.txt.bak
+MODULES=/etc/modules
+MODULES_BAK=/etc/uctronics/backup/modules.bak
 UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
 UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
 STARTUP=/usr/bin/uctronics-lcd-startup
@@ -193,22 +195,26 @@ if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
 	echo ""
 	echo ""
-	echo "${blue}Creating a Backup of ${CONFIG} ...${std}"
+	echo "${blue}Creating Backups of ${CONFIG} and ${MODULES} ...${std}"
 	echo ""
 	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
 	sudo cp $CONFIG $CONFIG_BAK
+	echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
+	sudo cp $MODULES $MODULES_BAK
 	echo ""
 	echo "${blue}Backup created! Continuing the Installation!${std}"
 	sleep 1
 else
 	echo ""
 	echo ""
-	echo "${blue}Creating Backups of ${CONFIG} and ${RC_LOCAL} ...${std}"
+	echo "${blue}Creating Backups of ${CONFIG}, ${RC_LOCAL} and ${MODULES} ...${std}"
 	echo ""
 	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
 	sudo cp $CONFIG $CONFIG_BAK
 	echo "${blue}Copying ${RC_LOCAL} to ${RC_LOCAL_BAK} ...${std}"
 	sudo cp $RC_LOCAL $RC_LOCAL_BAK
+	echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
+	sudo cp $MODULES $MODULES_BAK
 	echo ""
 	echo "${blue}Backups created! Continuing the Installation!${std}"
 	sleep 1
@@ -234,7 +240,7 @@ sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
 
 if ! grep -q "^i2c[-_]dev" /etc/modules
 then
-	sudo printf "i2c-dev\n" >> /etc/modules
+	printf "i2c-dev\n" | sudo tee -a /etc/modules
 fi
 
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
