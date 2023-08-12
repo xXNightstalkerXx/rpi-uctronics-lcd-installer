@@ -153,6 +153,7 @@ else
 	echo ""
         echo "${red}Git is not installed. Installing Git now!${std}"
 	sudo apt-get install git -y
+	sleep 1
 fi
 echo ""
 echo "${blue}Git is installed and okay! Continuing Installation!${std}"
