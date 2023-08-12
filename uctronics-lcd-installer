@@ -245,7 +245,7 @@ fi
 
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
 sudo dtparam i2c_arm=$I2C_SETTING
-echo "${blue}Modprobing the I2C Interface...${std}"
+echo "${blue}Loading the I2C Kernel Module...${std}"
 sudo modprobe i2c-dev
 
 echo ""
