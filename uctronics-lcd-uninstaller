@@ -147,8 +147,8 @@ echo "dtparam=i2c_arm=${I2C_SETTING}"
 sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING}/" $CONFIG
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
 sudo dtparam i2c_arm=$I2C_SETTING
-echo "${blue}Modprobing the I2C Interface...${std}"
-modprobe i2c-dev
+echo "${blue}Unloading the I2C Kernel Module...${std}"
+rmmod i2c-dev
 echo ""
 echo "${blue}I2C Interface disabled! Continuing to Uninstall!${std}"
 sleep 1
@@ -168,75 +168,7 @@ if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
 	echo ""
 	echo ""
-	echo "${green}A Backup of ${CONFIG} and ${MODULES} was created during Installation.${std}"
-	echo "${green}Do you want to recover, safe or delete it?${std}"
-	echo ""
-	echo "1. Recover the Backup"
-	echo "2. Safe the Backup"
-	echo "3. Delete the Backup"
-
-	echo ""
-	read -p "${green}Enter a Number for an Option: ${std}" n
-
-	while [[ $n -lt 1 || $n -gt 3 ]]
-	do
-        echo ""
-        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
-        read -p "Enter a Number for an Option: " n;
-	done
-	
-	if [[ $n -eq 1 ]]
-	then
-		echo ""
-		echo ""
-		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${MODULES} !${std}"
-		echo "${blue}Deleting current ${CONFIG} and ${MODULES} and moving the Backups from ${std}"
-		echo "${blue}${CONFIG_BAK} and ${MODULES_BAK} there instead...${std}"
-		sudo mv $CONFIG_BAK $CONFIG
-		echo ""
-		echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
-		sleep 1
-	elif [[ $n -eq 2 ]]
-	then
-		echo ""
-		echo ""
-		echo "${green}You selected to safe the Backup ${CONFIG_BAK}!${std}"
-		echo "${green}Please enter the full path to a Directory where to safe it!${std}"
-		echo "${green}If the Directory doesn't exist the Backup will be safed at ${TEMP_DIR}!${std}"
-		echo ""
-		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
-
-		if [ -d "$n" ]
-		then
-			echo ""
-			echo "${blue}Directory exists! Moving the Backup file there...${std}"
-			n=$n"/config.txt"
-			sudo mv $CONFIG_BAK $n
-			echo ""
-			echo "${blue}Backup is safed at ${n}! Continuing to Uninstall!${std}"
-			sleep 1
-		else
-			echo "${red}Directory doesn't exist! Moving the Backup file to ${TEMP_DIR} ...${std}"
-			sudo mkdir -p $TEMP_DIR
-			n=$TEMP_DIR"/config.txt"
-			sudo mv $CONFIG_BAK $n
-			echo ""
-			echo "${blue}Backup is safed at ${n}! Continuing to Uninstall!${std}"
-			sleep 1
-		fi
-	elif [[ $n -eq 3 ]]
-	then
-		echo ""
-		echo ""
-		echo "${blue}You selected to delete the Backup ${CONFIG_BAK}!${std}"
-		echo ""
-		echo "${blue}Backup will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
-		sleep 1
-	fi
-else
-	echo ""
-	echo ""
-	echo "${green}Backups of ${CONFIG} and ${RC_LOCAL} were created during Installation.${std}"
+	echo "${green}Backups of ${CONFIG} and ${MODULES} were created during Installation.${std}"
 	echo "${green}Do you want to recover, safe or delete them?${std}"
 	echo ""
 	echo "1. Recover the Backups"
@@ -257,11 +189,86 @@ else
 	then
 		echo ""
 		echo ""
-		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
+		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
+		sudo mv $CONFIG_BAK $CONFIG
+		echo "${blue}Deleting current ${MODULES} and moving the Backup from ${MODULES_BAK} there instead...${std}"
+		sudo mv $MODULES_BAK $MODULES
+		echo ""
+		echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
+		sleep 1
+	elif [[ $n -eq 2 ]]
+	then
+		echo ""
+		echo ""
+		echo "${green}You selected to safe the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
+		echo "${green}Please enter the full path to a Directory where to safe them!${std}"
+		echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
+		echo ""
+		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
+
+		if [ -d "$n" ]
+		then
+			echo ""
+			echo "${blue}Directory exists! Moving the Backup files there...${std}"
+			config_temp=$n"/config.txt"
+			modules_temp=$n"/modules"
+			sudo mv $CONFIG_BAK $config_temp
+			sudo mv $MODULES_BAK $modules_temp
+			echo ""
+			echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
+			sleep 1
+		else
+			echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} ...${std}"
+			sudo mkdir -p $TEMP_DIR
+			config_temp=$TEMP_DIR"/config.txt"
+			modules_temp=$TEMP_DIR"/modules"
+			sudo mv $CONFIG_BAK $config_temp
+			sudo mv $MODULES_BAK $modules_temp
+			echo ""
+			echo "${blue}Backups are safed at ${TEMP_DIR}! Continuing to Uninstall!${std}"
+			sleep 1
+		fi
+	elif [[ $n -eq 3 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to delete the Backups of ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
+		echo ""
+		echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
+		sleep 1
+	fi
+else
+	echo ""
+	echo ""
+	echo "${green}Backups of ${CONFIG}, ${RC_LOCAL} and ${MODULES} were created during Installation.${std}"
+	echo "${green}Do you want to recover, safe or delete them?${std}"
+	echo ""
+	echo "1. Recover the Backups"
+	echo "2. Safe the Backups"
+	echo "3. Delete the Backups"
+
+	echo ""
+	read -p "${green}Enter a Number for an Option: ${std}" n
+
+	while [[ $n -lt 1 || $n -gt 3 ]]
+	do
+        echo ""
+        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
+        read -p "Enter a Number for an Option: " n;
+	done
+	
+	if [[ $n -eq 1 ]]
+	then
+		echo ""
+		echo ""
+		echo "${blue}You selected to recover the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
 		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
 		sudo mv $CONFIG_BAK $CONFIG
 		echo "${blue}Deleting current ${RC_LOCAL} and moving the Backup from ${RC_LOCAL_BAK} there instead...${std}"
 		sudo mv $RC_LOCAL_BAK $RC_LOCAL
+		echo "${blue}Deleting current ${MODULES} and moving the Backup from ${MODULES_BAK} there instead...${std}"
+		sudo mv $MODULES_BAK $MODULES
 		echo ""
 		echo "${blue}Backups recovered! Continuing to Uninstall!${std}"
 		sleep 1
@@ -269,7 +276,7 @@ else
 	then
 		echo ""
 		echo ""
-		echo "${green}You selected to safe the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo "${green}You selected to safe the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
 		echo "${green}Please enter the full path to a Directory where to safe them!${std}"
 		echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
 		echo ""
@@ -281,8 +288,10 @@ else
 			echo "${blue}Directory exists! Moving the Backup files there...${std}"
 			config_temp=$n"/config.txt"
 			rc_local_temp=$n"/rc.local"
+			modules_temp=$n"/modules"
 			sudo mv $CONFIG_BAK $config_temp
 			sudo mv $RC_LOCAL_BAK $rc_local_temp
+			sudo mv $MODULES_BAK $modules_temp
 			echo ""
 			echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
 			sleep 1
@@ -291,17 +300,19 @@ else
 			sudo mkdir -p $TEMP_DIR
 			config_temp=$TEMP_DIR"/config.txt"
 			rc_local_temp=$TEMP_DIR"/rc.local"
+			modules_temp=$TEMP_DIR"/modules"
 			sudo mv $CONFIG_BAK $config_temp
 			sudo mv $RC_LOCAL_BAK $rc_local_temp
+			sudo mv $MODULES_BAK $modules_temp
 			echo ""
-			echo "${blue}Backups are safed at $TEMP_DIR! Continuing to Uninstall!${std}"
+			echo "${blue}Backups are safed at ${TEMP_DIR}! Continuing to Uninstall!${std}"
 			sleep 1
 		fi
 	elif [[ $n -eq 3 ]]
 	then
 		echo ""
 		echo ""
-		echo "${blue}You selected to delete the Backups ${CONFIG_BAK} and ${RC_LOCAL_BAK}!${std}"
+		echo "${blue}You selected to delete the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
 		echo ""
 		echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
 		sleep 1
