@@ -116,6 +116,16 @@ sleep 1
 
 echo ""
 echo ""
+echo "${blue}Updating Repository List...${std}"
+
+sudo apt-get update
+
+echo ""
+echo "${blue}Repository List updated! Continuing Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
 echo "${green}Do you want to update your OS before Installation?${std}"
 echo "${green}Updating is strongly recommended else the Installation might fail!${std}"
 
@@ -134,7 +144,6 @@ then
         echo ""
         echo "${blue}Updating the OS now...${std}"
 
-	sudo apt-get update
 	sudo apt-get upgrade -y
 
         echo ""
@@ -184,7 +193,6 @@ then
 else
 	echo ""
         echo "${red}Git is not installed. Installing Git now!${std}"
-	sudo apt-get update
 	sudo apt-get install git -y
 	sleep 1
 fi
@@ -202,7 +210,6 @@ then
 else
 	echo ""
         echo "${red}DTParam is not installed. Installing it now!${std}"
-	sudo apt-get update
 	sudo apt-get install dtparam -y
 	sleep 1
 fi
