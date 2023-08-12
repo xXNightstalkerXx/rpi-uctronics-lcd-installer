@@ -246,7 +246,7 @@ fi
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
 sudo dtparam i2c_arm=$I2C_SETTING
 echo "${blue}Modprobing the I2C Interface...${std}"
-modprobe i2c-dev
+sudo modprobe i2c-dev
 
 echo ""
 echo "${blue}I2C Interface Setup is completed! Continuing the Installation!${std}"
