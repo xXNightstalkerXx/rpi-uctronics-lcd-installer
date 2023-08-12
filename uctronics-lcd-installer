@@ -234,7 +234,7 @@ sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
 
 if ! grep -q "^i2c[-_]dev" /etc/modules
 then
-	printf "i2c-dev\n" >> /etc/modules
+	sudo printf "i2c-dev\n" >> /etc/modules
 fi
 
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
