@@ -194,6 +194,24 @@ sleep 1
 
 echo ""
 echo ""
+echo "${blue}Checking if DTParam is installed...${std}"
+if hash dtparam 2>/dev/null
+then
+	echo ""
+        echo "${blue}DTParam is already installed!${std}"
+else
+	echo ""
+        echo "${red}DTParam is not installed. Installing it now!${std}"
+	sudo apt-get update
+	sudo apt-get install dtparam -y
+	sleep 1
+fi
+echo ""
+echo "${blue}DTParam is installed and okay! Continuing Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
 echo "${blue}Installing the official UCTronics Repository...${std}"
 echo ""
 echo "${blue}Switching into the Installation Directory...${std}"
