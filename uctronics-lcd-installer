@@ -117,7 +117,7 @@ sleep 1
 echo ""
 echo ""
 echo "${green}Do you want to update your OS before Installation?${std}"
-echo "${green}Updating is strongly recommended else the Installation might fail!$
+echo "${green}Updating is strongly recommended else the Installation might fail!${std}"
 
 echo ""
 read -p "${green}Yes (y)/ No (n): ${std}" n;
