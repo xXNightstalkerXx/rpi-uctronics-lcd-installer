@@ -148,7 +148,7 @@ sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING}/" $CONFIG
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
 sudo dtparam i2c_arm=$I2C_SETTING
 echo "${blue}Unloading the I2C Kernel Module...${std}"
-rmmod i2c-dev
+sudo rmmod i2c-dev
 echo ""
 echo "${blue}I2C Interface disabled! Continuing to Uninstall!${std}"
 sleep 1
