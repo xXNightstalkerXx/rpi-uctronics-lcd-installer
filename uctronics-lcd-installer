@@ -116,6 +116,38 @@ sleep 1
 
 echo ""
 echo ""
+echo "${green}Do you want to update your OS before Installation?${std}"
+echo "${green}Updating is strongly recommended else the Installation might fail!$
+
+echo ""
+read -p "${green}Yes (y)/ No (n): ${std}" n;
+
+while ! [[ "$n" =~ ^(y|n)$ ]];
+do
+        echo ""
+        echo "${red}Wrong Input! Please type 'y' for 'YES' or 'n' for 'NO'!${std}"
+        read -p "Yes (y)/ No (n): " n;
+done
+
+if [[ "$n" =~ ^(y)$ ]];
+then
+        echo ""
+        echo "${blue}Updating the OS now...${std}"
+
+	sudo apt-get update
+	sudo apt-get upgrade -y
+
+        echo ""
+        echo "${blue}Operating System updated successfully! Continuing the Installation!${std}"
+        sleep 1
+else
+        echo ""
+        echo "${red}Not updating your OS! Installation might fail!${std}"
+	sleep 1
+fi
+
+echo ""
+echo ""
 echo "${blue}Checking Installation Directory...${std}"
 echo "$INSTALL_DIR"
 
