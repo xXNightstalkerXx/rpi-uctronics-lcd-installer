@@ -15,6 +15,8 @@ UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
 UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
 STARTUP=/usr/bin/uctronics-lcd-startup
 STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
+SYSTEMD=/etc/systemd/system/uctronics-lcd.service
+SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 
 #URL Declarations
 UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
@@ -99,15 +101,10 @@ elif [[ $INSTALL_OPTIONS -eq 2 ]]
 then
 	#OS Specific Directory Declarations
 	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-	RC_LOCAL=/etc/rc.local
-	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
-	
 elif [[ $INSTALL_OPTIONS -eq 3 ]]
 then
 	#OS Specific Directory Declarations
 	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-	RC_LOCAL=/etc/rc.local
-	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
 fi
 
 echo ""
@@ -126,8 +123,8 @@ sleep 1
 
 echo ""
 echo ""
-echo "${green}Do you want to update your OS before Installation?${std}"
-echo "${green}Updating is strongly recommended else the Installation might fail!${std}"
+echo "${green}It is highly recommended to update your OS before Installation!${std}"
+echo "${green}Do you want to update your OS?${std}"
 
 echo ""
 read -p "${green}Yes (y)/ No (n): ${std}" n;
@@ -200,22 +197,25 @@ echo ""
 echo "${blue}Git is installed and okay! Continuing Installation!${std}"
 sleep 1
 
-echo ""
-echo ""
-echo "${blue}Checking if DTParam is installed...${std}"
-if hash dtparam 2>/dev/null
+if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
 	echo ""
-        echo "${blue}DTParam is already installed!${std}"
-else
 	echo ""
-        echo "${red}DTParam is not installed. Installing it now!${std}"
-	sudo apt-get install dtparam -y
+	echo "${blue}Checking if DTParam is installed...${std}"
+	if hash dtparam 2>/dev/null
+	then
+		echo ""
+        	echo "${blue}DTParam is already installed!${std}"
+	else
+		echo ""
+        	echo "${red}DTParam is not installed. Installing it now!${std}"
+		sudo apt-get install dtparam -y
+		sleep 1
+	fi
+	echo ""
+	echo "${blue}DTParam is installed and okay! Continuing Installation!${std}"
 	sleep 1
 fi
-echo ""
-echo "${blue}DTParam is installed and okay! Continuing Installation!${std}"
-sleep 1
 
 echo ""
 echo ""
@@ -250,34 +250,17 @@ sudo cp $STARTUP_BAK $STARTUP
 echo "${blue}Installation of the UCTRONICS-LCD-INSTALLER Repository completed! Continuing the Installation!${std}"
 sleep 1
 
-if [[ $INSTALL_OPTIONS -eq 1 ]]
-then
-	echo ""
-	echo ""
-	echo "${blue}Creating Backups of ${CONFIG} and ${MODULES} ...${std}"
-	echo ""
-	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
-	sudo cp $CONFIG $CONFIG_BAK
-	echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
-	sudo cp $MODULES $MODULES_BAK
-	echo ""
-	echo "${blue}Backup created! Continuing the Installation!${std}"
-	sleep 1
-else
-	echo ""
-	echo ""
-	echo "${blue}Creating Backups of ${CONFIG}, ${RC_LOCAL} and ${MODULES} ...${std}"
-	echo ""
-	echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
-	sudo cp $CONFIG $CONFIG_BAK
-	echo "${blue}Copying ${RC_LOCAL} to ${RC_LOCAL_BAK} ...${std}"
-	sudo cp $RC_LOCAL $RC_LOCAL_BAK
-	echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
-	sudo cp $MODULES $MODULES_BAK
-	echo ""
-	echo "${blue}Backups created! Continuing the Installation!${std}"
-	sleep 1
-fi
+echo ""
+echo ""
+echo "${blue}Creating Backups of ${CONFIG} and ${MODULES} ...${std}"
+echo ""
+echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
+sudo cp $CONFIG $CONFIG_BAK
+echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
+sudo cp $MODULES $MODULES_BAK
+echo ""
+echo "${blue}Backups created! Continuing the Installation!${std}"
+sleep 1
 
 echo ""
 echo ""
@@ -321,29 +304,21 @@ echo ""
 echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
 sleep 1
 
-if [[ $INSTALL_OPTIONS -eq 1 ]]
-then
-	echo ""
-	echo ""
-	echo "${blue}Enabling automatic Startup Script...${std}"
-	echo ""
-	echo "${blue}Adding necessary lines to Crontab...${std}"
-	sudo crontab -u root -l
-	(sudo crontab -u root -l; echo "$CRON" ) | sudo crontab -u root -
-	echo ""
-	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
-	sleep 1
-else
-	echo ""
-	echo ""
-	echo "${blue}Enabling automatic Startup Script...${std}"
-	echo ""
-	echo "${blue}Adding necessary lines to ${RC_LOCAL} ...${std}"
-	(grep -v "exit 0" $RC_LOCAL; printf "bash /usr/bin/uctronics-lcd-startup &\n\nexit 0") | sudo tee $RC_LOCAL
-	echo ""
-	echo "${blue}Enabled the Startup Script! Continuing the Installation!${std}"
-	sleep 1
-fi
+echo ""
+echo ""
+echo "${blue}Configuring the systemd LCD Service for automatic startup...${std}"
+echo ""
+echo "${blue}Copying ${SYSTEMD_BAK} to ${SYSTEMD}...${std}"
+sudo cp $SYSTEMD_BAK $SYSTEMD
+echo "${blue}Reloading the systemd Services...${std}"
+sudo systemctl daemon-reload
+echo "${blue}Starting the LCD Service...${std}"
+sudo systemctl start uctronics-lcd
+echo "${blue}Enabling the LCD Service for automatic startup at boot...${std}"
+sudo systemctl enable uctronics-lcd
+echo ""
+echo "${blue}Systemd Service enabled! Continuing the Installation!${std}"
+sleep 1
 
 echo ""
 echo ""
