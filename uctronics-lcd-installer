@@ -26,9 +26,6 @@ INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-install
 #I2C Interface Setting
 I2C_SETTING=on
 
-#Crontab Input
-CRON="@reboot ${STARTUP}"
-
 #Color Declarations
 std=`tput setaf 15`
 red=`tput setaf 9 bold`
