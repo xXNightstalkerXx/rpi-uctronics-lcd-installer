@@ -9,6 +9,8 @@ UC_BAK_DIR=/etc/uctronics/backup
 SCRIPTS_DIR=/usr/bin
 CONFIG=/boot/config.txt
 CONFIG_BAK=/etc/uctronics/backup/config.txt.bak
+MODULES=/etc/modules
+MODULES_BAK=/etc/uctronics/backup/modules.bak
 UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
 UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
 STARTUP=/usr/bin/uctronics-lcd-startup
@@ -166,7 +168,7 @@ if [[ $INSTALL_OPTIONS -eq 1 ]]
 then
 	echo ""
 	echo ""
-	echo "${green}A Backup of ${CONFIG} was created during Installation.${std}"
+	echo "${green}A Backup of ${CONFIG} and ${MODULES} was created during Installation.${std}"
 	echo "${green}Do you want to recover, safe or delete it?${std}"
 	echo ""
 	echo "1. Recover the Backup"
@@ -187,8 +189,9 @@ then
 	then
 		echo ""
 		echo ""
-		echo "${blue}You selected to recover the Backup ${CONFIG_BAK}!${std}"
-		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
+		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${MODULES} !${std}"
+		echo "${blue}Deleting current ${CONFIG} and ${MODULES} and moving the Backups from ${std}"
+		echo "${blue}${CONFIG_BAK} and ${MODULES_BAK} there instead...${std}"
 		sudo mv $CONFIG_BAK $CONFIG
 		echo ""
 		echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
