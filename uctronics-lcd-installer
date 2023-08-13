@@ -206,7 +206,7 @@ then
 	else
 		echo ""
         	echo "${red}DTParam is not installed. Installing it now!${std}"
-		sudo apt-get install dtparam -y
+		sudo apt-get install libraspberrypi-bin -y
 		sleep 1
 	fi
 	echo ""
