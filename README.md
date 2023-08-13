@@ -2,13 +2,10 @@
 This Repository has some bash Scripts in it that download and setup the neccessary Files for the UCtronics Rackmount LCD to show status Info.
 The Installer creates a new Directory where this Repository and the UCTronics SKU_RM0004 Repository get downloaded into.
 
-After downloading the necessary Files it will setup the I2C Interface, and depending on the OS, setup a custom Startup Script
-which will launch the LCD Status Display at every boot. (At the moment just Raspbian and RPI Kali Linux supported!)
+After downloading the necessary Files it will setup the I2C Interface and create a systemd Service to start the Status LCD
+automagically at boot. (At the moment just Raspbian and RPI Kali Linux tested/ supported!)
 
-On Raspbian it will launch the Startup Script with the rc.local file.
-On Kali Linux it has to insert a Cron job to start the Script because there is no rc.local file.
-
-The Installer also creates a backup of these Files before changing them!
+The Installer also creates a backup of the /etc/modules and /boot/config.txt Files before changing them!
 
 I'm not an expert Coder so use this Repo on your own Risk and don't blame me if you have to reinstall your Raspberry.
 
