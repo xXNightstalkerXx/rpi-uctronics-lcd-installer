@@ -15,6 +15,8 @@ UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
 UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
 STARTUP=/usr/bin/uctronics-lcd-startup
 STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
+SYSTEMD=/etc/systemd/system/uctronics-lcd.service
+SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 TEMP_DIR=/tmp/backup
 
 #URL Declarations
@@ -24,9 +26,6 @@ INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-install
 
 #I2C Interface Setting
 I2C_SETTING=off
-
-#Crontab Input
-CRON="@reboot ${STARTUP}"
 
 #Color Declarations
 std=`tput setaf 15`
@@ -100,43 +99,31 @@ elif [[ $INSTALL_OPTIONS -eq 2 ]]
 then
 	#OS Specific Directory Declarations
 	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-	RC_LOCAL=/etc/rc.local
-	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
-	
 elif [[ $INSTALL_OPTIONS -eq 3 ]]
 then
 	#OS Specific Directory Declarations
 	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
-	RC_LOCAL=/etc/rc.local
-	RC_LOCAL_BAK=/etc/uctronics/backup/rc.local.bak
 fi
 
 echo ""
 echo "${blue}Operating System okay! Continuing to Uninstall!${std}"
 sleep 1
 
-if [[ $INSTALL_OPTIONS -eq 1 ]]
-then
-	echo ""
-	echo ""
-	echo "${blue}Reverting Changes for automatic startup...${std}"
-	echo ""
-	echo "${blue}Deleting lines in Crontab...${std}"
-	(sudo crontab -u root -l | grep -v "$CRON" ) | sudo crontab -u root -
-	echo ""
-	echo "${blue}Disabled the Startup Script! Continuing to Uninstall!${std}"
-	sleep 1
-else
-	echo ""
-	echo ""
-	echo "${blue}Reverting Changes for automatic startup...${std}"
-	echo ""
-	echo "${blue}Deleting lines in ${RC_LOCAL} ...${std}"
-	grep -v "./uctronics-lcd-startup &" $RC_LOCAL | sudo tee $RC_LOCAL
-	echo ""
-	echo "${blue}Disabled the Startup Script! Continuing to Uninstall!${std}"
-	sleep 1
-fi
+echo ""
+echo ""
+echo "${blue}Removing the systemd LCD Service...${std}"
+echo ""
+echo "${blue}Stopping systemd LCD Service...${std}"
+sudo systemctl stop uctronics-lcd
+echo "${blue}Disabling systemd LCD Service...${std}"
+sudo systemctl disable uctronics-lcd
+echo "${blue}Removing ${SYSTEMD} ...${std}"
+sudo rm $SYSTEMD
+echo "${blue}Reloading systemd Daemons...${std}"
+sudo systemctl daemon-reload
+echo ""
+echo "${blue}Successfully removed the systemd LCD Service! Continuing to Uninstall!${std}"
+sleep 1
 
 echo ""
 echo ""
@@ -164,159 +151,77 @@ echo ""
 echo "${blue}ON/OFF Switch support disabled! Continuing to Uninstall!${std}"
 sleep 1
 
-if [[ $INSTALL_OPTIONS -eq 1 ]]
+echo ""
+echo ""
+echo "${green}Backups of ${CONFIG} and ${MODULES} were created during Installation.${std}"
+echo "${green}Do you want to recover, safe or delete them?${std}"
+echo ""
+echo "1. Recover the Backups"
+echo "2. Safe the Backups"
+echo "3. Delete the Backups"
+
+echo ""
+read -p "${green}Enter a Number for an Option: ${std}" n
+
+while [[ $n -lt 1 || $n -gt 3 ]]
+do
+	echo ""
+	echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
+	read -p "Enter a Number for an Option: " n;
+done
+	
+if [[ $n -eq 1 ]]
 then
 	echo ""
 	echo ""
-	echo "${green}Backups of ${CONFIG} and ${MODULES} were created during Installation.${std}"
-	echo "${green}Do you want to recover, safe or delete them?${std}"
+	echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
+	echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
+	sudo mv $CONFIG_BAK $CONFIG
+	echo "${blue}Deleting current ${MODULES} and moving the Backup from ${MODULES_BAK} there instead...${std}"
+	sudo mv $MODULES_BAK $MODULES
 	echo ""
-	echo "1. Recover the Backups"
-	echo "2. Safe the Backups"
-	echo "3. Delete the Backups"
-
+	echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
+	sleep 1
+elif [[ $n -eq 2 ]]
+then
 	echo ""
-	read -p "${green}Enter a Number for an Option: ${std}" n
+	echo ""
+	echo "${green}You selected to safe the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
+	echo "${green}Please enter the full path to a Directory where to safe them!${std}"
+	echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
+	echo ""
+	read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
 
-	while [[ $n -lt 1 || $n -gt 3 ]]
-	do
-        echo ""
-        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
-        read -p "Enter a Number for an Option: " n;
-	done
-	
-	if [[ $n -eq 1 ]]
+	if [ -d "$n" ]
 	then
 		echo ""
+		echo "${blue}Directory exists! Moving the Backup files there...${std}"
+		config_temp=$n"/config.txt"
+		modules_temp=$n"/modules"
+		sudo mv $CONFIG_BAK $config_temp
+		sudo mv $MODULES_BAK $modules_temp
 		echo ""
-		echo "${blue}You selected to recover the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
-		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
-		sudo mv $CONFIG_BAK $CONFIG
-		echo "${blue}Deleting current ${MODULES} and moving the Backup from ${MODULES_BAK} there instead...${std}"
-		sudo mv $MODULES_BAK $MODULES
-		echo ""
-		echo "${blue}Backup recovered! Continuing to Uninstall!${std}"
+		echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
 		sleep 1
-	elif [[ $n -eq 2 ]]
-	then
+	else
+		echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} instead...${std}"
+		sudo mkdir -p $TEMP_DIR
+		config_temp=$TEMP_DIR"/config.txt"
+		modules_temp=$TEMP_DIR"/modules"
+		sudo mv $CONFIG_BAK $config_temp
+		sudo mv $MODULES_BAK $modules_temp
 		echo ""
-		echo ""
-		echo "${green}You selected to safe the Backups ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
-		echo "${green}Please enter the full path to a Directory where to safe them!${std}"
-		echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
-		echo ""
-		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
-
-		if [ -d "$n" ]
-		then
-			echo ""
-			echo "${blue}Directory exists! Moving the Backup files there...${std}"
-			config_temp=$n"/config.txt"
-			modules_temp=$n"/modules"
-			sudo mv $CONFIG_BAK $config_temp
-			sudo mv $MODULES_BAK $modules_temp
-			echo ""
-			echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
-			sleep 1
-		else
-			echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} ...${std}"
-			sudo mkdir -p $TEMP_DIR
-			config_temp=$TEMP_DIR"/config.txt"
-			modules_temp=$TEMP_DIR"/modules"
-			sudo mv $CONFIG_BAK $config_temp
-			sudo mv $MODULES_BAK $modules_temp
-			echo ""
-			echo "${blue}Backups are safed at ${TEMP_DIR}! Continuing to Uninstall!${std}"
-			sleep 1
-		fi
-	elif [[ $n -eq 3 ]]
-	then
-		echo ""
-		echo ""
-		echo "${blue}You selected to delete the Backups of ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
-		echo ""
-		echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
+		echo "${blue}Backups are safed at ${TEMP_DIR}! Continuing to Uninstall!${std}"
 		sleep 1
 	fi
-else
+elif [[ $n -eq 3 ]]
+then
 	echo ""
 	echo ""
-	echo "${green}Backups of ${CONFIG}, ${RC_LOCAL} and ${MODULES} were created during Installation.${std}"
-	echo "${green}Do you want to recover, safe or delete them?${std}"
+	echo "${blue}You selected to delete the Backups of ${CONFIG_BAK} and ${MODULES_BAK}!${std}"
 	echo ""
-	echo "1. Recover the Backups"
-	echo "2. Safe the Backups"
-	echo "3. Delete the Backups"
-
-	echo ""
-	read -p "${green}Enter a Number for an Option: ${std}" n
-
-	while [[ $n -lt 1 || $n -gt 3 ]]
-	do
-        echo ""
-        echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
-        read -p "Enter a Number for an Option: " n;
-	done
-	
-	if [[ $n -eq 1 ]]
-	then
-		echo ""
-		echo ""
-		echo "${blue}You selected to recover the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
-		echo "${blue}Deleting current ${CONFIG} and moving the Backup from ${CONFIG_BAK} there instead...${std}"
-		sudo mv $CONFIG_BAK $CONFIG
-		echo "${blue}Deleting current ${RC_LOCAL} and moving the Backup from ${RC_LOCAL_BAK} there instead...${std}"
-		sudo mv $RC_LOCAL_BAK $RC_LOCAL
-		echo "${blue}Deleting current ${MODULES} and moving the Backup from ${MODULES_BAK} there instead...${std}"
-		sudo mv $MODULES_BAK $MODULES
-		echo ""
-		echo "${blue}Backups recovered! Continuing to Uninstall!${std}"
-		sleep 1
-	elif [[ $n -eq 2 ]]
-	then
-		echo ""
-		echo ""
-		echo "${green}You selected to safe the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
-		echo "${green}Please enter the full path to a Directory where to safe them!${std}"
-		echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
-		echo ""
-		read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
-
-		if [ -d "$n" ]
-		then
-			echo ""
-			echo "${blue}Directory exists! Moving the Backup files there...${std}"
-			config_temp=$n"/config.txt"
-			rc_local_temp=$n"/rc.local"
-			modules_temp=$n"/modules"
-			sudo mv $CONFIG_BAK $config_temp
-			sudo mv $RC_LOCAL_BAK $rc_local_temp
-			sudo mv $MODULES_BAK $modules_temp
-			echo ""
-			echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
-			sleep 1
-		else
-			echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} ...${std}"
-			sudo mkdir -p $TEMP_DIR
-			config_temp=$TEMP_DIR"/config.txt"
-			rc_local_temp=$TEMP_DIR"/rc.local"
-			modules_temp=$TEMP_DIR"/modules"
-			sudo mv $CONFIG_BAK $config_temp
-			sudo mv $RC_LOCAL_BAK $rc_local_temp
-			sudo mv $MODULES_BAK $modules_temp
-			echo ""
-			echo "${blue}Backups are safed at ${TEMP_DIR}! Continuing to Uninstall!${std}"
-			sleep 1
-		fi
-	elif [[ $n -eq 3 ]]
-	then
-		echo ""
-		echo ""
-		echo "${blue}You selected to delete the Backups ${CONFIG_BAK}, ${RC_LOCAL_BAK} and ${MODULES_BAK}!${std}"
-		echo ""
-		echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
-		sleep 1
-	fi
+	echo "${blue}Backups will be deleted in the Uninstall process! Continuing to Uninstall!${std}"
+	sleep 1
 fi
 
 echo ""
