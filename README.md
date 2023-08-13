@@ -36,11 +36,20 @@ The Installer does the rest of the Job for you now.
 ----------------------------------------------------------------
 # HOW TO USE
 
-    uctronics-lcd-startup
-Will manually activate the Startup Script and launch the Status LCD Display
+    sudo systemctl start uctronics-lcd
+Will start the uctronics-lcd service and activate the Status LCD until reboot
+
+    sudo systemctl stop uctronics-lcd
+Will stop the uctronics-lcd service and deactivate the Status LCD
+
+    sudo systemctl enable uctronics-lcd
+Enables the automatic startup of the Status LCD after boot
+
+    sudo systemctl disable uctronics-lcd
+Disables the automatic startup of the Status LCD after boot
 
     uctronics-lcd-uninstaller
-Will revert all changes to rc.local and config.txt file and switch off I2C Interface.
+Will revert all changes to /etc/modules, /boot/config.txt and systemd and switch off the I2C Interface.
 Also delete's all associated Files.
 
 ----------------------------------------------------------------
