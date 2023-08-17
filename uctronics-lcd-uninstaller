@@ -86,7 +86,7 @@ then
 	fi
 else
 	echo ""
-	echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
+	echo "${red}Wrong Operating System detected! Aborting to Uninstall!${std}"
 	sleep 1
 	exit 1
 fi
