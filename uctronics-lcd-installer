@@ -151,6 +151,8 @@ fi
 
 echo ""
 echo ""
+echo "${blue}Checking Directories...${std}"
+echo ""
 echo "${blue}Checking Installation Directory...${std}"
 echo "$INSTALL_DIR"
 
