@@ -246,6 +246,7 @@ echo "${blue}Copying the uctronics-lcd-uninstaller Script into $SCRIPTS_DIR ...$
 sudo cp $UNINSTALL_BAK $UNINSTALL
 echo "${blue}Copying the uctronics-lcd-startup Script into $SCRIPTS_DIR ...${std}"
 sudo cp $STARTUP_BAK $STARTUP
+echo ""
 echo "${blue}Installation of the UCTRONICS-LCD-INSTALLER Repository completed! Continuing the Installation!${std}"
 sleep 1
 
