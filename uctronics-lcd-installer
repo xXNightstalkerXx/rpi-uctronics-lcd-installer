@@ -27,12 +27,12 @@ INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-install
 I2C_SETTING=on
 
 #Color Declarations
-std=`tput setaf 15`
-red=`tput setaf 9 bold`
-green=`tput setaf 10 bold`
-yellow=`tput setaf 11 bold`
-pink=`tput setaf 57`
-blue=`tput setaf 27 bold`
+std=$(tput setaf 15)
+red=$(tput setaf 9 bold)
+green=$(tput setaf 10 bold)
+yellow=$(tput setaf 11 bold)
+pink=$(tput setaf 57)
+blue=$(tput setaf 27 bold)
 
 #Main Script
 echo ""
@@ -124,13 +124,13 @@ echo "${green}It is highly recommended to update your OS before Installation!${s
 echo "${green}Do you want to update your OS?${std}"
 
 echo ""
-read -p "${green}Yes (y)/ No (n): ${std}" n;
+read -r -p "${green}Yes (y)/ No (n): ${std}" n;
 
 while ! [[ "$n" =~ ^(y|n)$ ]];
 do
         echo ""
         echo "${red}Wrong Input! Please type 'y' for 'YES' or 'n' for 'NO'!${std}"
-        read -p "Yes (y)/ No (n): " n;
+        read -r -p "Yes (y)/ No (n): " n;
 done
 
 if [[ "$n" =~ ^(y)$ ]];
@@ -272,12 +272,12 @@ sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudra
 sudo sed -i "s/^#dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
 echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
 
-if ! [ -e $BLACKLIST ]
+if ! [ -e "$BLACKLIST" ]
 then
-	sudo touch $BLACKLIST
+	sudo touch "$BLACKLIST"
 fi
 
-sudo sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
+sudo sed "$BLACKLIST" -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
 sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
 
 if ! grep -q "^i2c[-_]dev" /etc/modules
@@ -336,12 +336,12 @@ then
 	echo "${blue}Purging the Directory now...${std}"
     	echo "${blue}Installation Complete! Good Bye!${std}"
 	echo ""
-    	sudo rm -d -r $START_DIR
+    	sudo rm -d -r "$START_DIR"
 else
     	echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
     	echo ""
 	echo "${red}Please reboot after the Installation!${std}"
     	echo "${blue}Installation Complete! Good Bye!${std}"
 	echo ""
-    	sudo rm $START_DIR"/uctronics-lcd-installer"
+    	sudo rm "$START_DIR""/uctronics-lcd-installer"
 fi

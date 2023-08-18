@@ -28,12 +28,12 @@ INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-install
 I2C_SETTING=off
 
 #Color Declarations
-std=`tput setaf 15`
-red=`tput setaf 9 bold`
-green=`tput setaf 10 bold`
-yellow=`tput setaf 11 bold`
-pink=`tput setaf 57`
-blue=`tput setaf 27 bold`
+std=$(tput setaf 15)
+red=$(tput setaf 9 bold)
+green=$(tput setaf 10 bold)
+yellow=$(tput setaf 11 bold)
+pink=$(tput setaf 57)
+blue=$(tput setaf 27 bold)
 
 #Main Script
 echo ""
@@ -161,13 +161,13 @@ echo "2. Safe the Backups"
 echo "3. Delete the Backups"
 
 echo ""
-read -p "${green}Enter a Number for an Option: ${std}" n
+read -r -p "${green}Enter a Number for an Option: ${std}" n
 
 while [[ $n -lt 1 || $n -gt 3 ]]
 do
 	echo ""
 	echo "${red}Wrong Input! Please Select a Number for an Option!${std}"
-	read -p "Enter a Number for an Option: " n;
+	read -r -p "Enter a Number for an Option: " n;
 done
 	
 if [[ $n -eq 1 ]]
@@ -190,7 +190,7 @@ then
 	echo "${green}Please enter the full path to a Directory where to safe them!${std}"
 	echo "${green}If the Directory doesn't exist the Backups will be safed at ${TEMP_DIR}!${std}"
 	echo ""
-	read -p "${green}Enter full path to a Directory where to safe it: ${std}" n
+	read -r -p "${green}Enter full path to a Directory where to safe it: ${std}" n
 
 	if [ -d "$n" ]
 	then
@@ -198,8 +198,8 @@ then
 		echo "${blue}Directory exists! Moving the Backup files there...${std}"
 		config_temp=$n"/config.txt"
 		modules_temp=$n"/modules"
-		sudo mv $CONFIG_BAK $config_temp
-		sudo mv $MODULES_BAK $modules_temp
+		sudo mv $CONFIG_BAK "$config_temp"
+		sudo mv $MODULES_BAK "$modules_temp"
 		echo ""
 		echo "${blue}Backups are safed at ${n}! Continuing to Uninstall!${std}"
 		sleep 1
