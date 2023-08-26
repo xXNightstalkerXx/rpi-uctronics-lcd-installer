@@ -196,8 +196,8 @@ then
 	then
 		echo ""
 		echo "${blue}Directory exists! Moving the Backup files there...${std}"
-		config_temp=$n"/config.txt"
-		modules_temp=$n"/modules"
+		config_temp=$n"/config_uclcd.bak"
+		modules_temp=$n"/modules_uclcd.bak"
 		sudo mv $CONFIG_BAK "$config_temp"
 		sudo mv $MODULES_BAK "$modules_temp"
 		echo ""
