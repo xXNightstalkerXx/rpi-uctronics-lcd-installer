@@ -282,7 +282,7 @@ sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
 
 if ! grep -q "^i2c[-_]dev" /etc/modules
 then
-	printf "i2c-dev\n" | sudo tee -a /etc/modules
+	printf "i2c-dev\n" | sudo tee -a /etc/modules > /dev/null
 fi
 
 echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
@@ -299,7 +299,7 @@ echo ""
 echo "${blue}Enabling ON/OFF Switch support...${std}"
 echo ""
 echo "${blue}Adding necessary lines at ${CONFIG} ...${std}"
-echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a $CONFIG
+echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a $CONFIG > /dev/null
 echo ""
 echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
 sleep 1
