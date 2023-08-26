@@ -128,24 +128,24 @@ read -r -p "${green}Yes (y)/ No (n): ${std}" n;
 
 while ! [[ "$n" =~ ^(y|n)$ ]];
 do
-        echo ""
-        echo "${red}Wrong Input! Please type 'y' for 'YES' or 'n' for 'NO'!${std}"
-        read -r -p "Yes (y)/ No (n): " n;
+	echo ""
+	echo "${red}Wrong Input! Please type 'y' for 'YES' or 'n' for 'NO'!${std}"
+	read -r -p "Yes (y)/ No (n): " n;
 done
 
 if [[ "$n" =~ ^(y)$ ]];
 then
-        echo ""
-        echo "${blue}Updating the OS now...${std}"
+	echo ""
+	echo "${blue}Updating the OS now...${std}"
 
 	sudo apt-get upgrade -y
 
-        echo ""
-        echo "${blue}Operating System updated successfully! Continuing the Installation!${std}"
-        sleep 1
+	echo ""
+	echo "${blue}Operating System updated successfully! Continuing the Installation!${std}"
+	sleep 1
 else
-        echo ""
-        echo "${red}Not updating your OS! Installation might fail!${std}"
+	echo ""
+	echo "${red}Not updating your OS! Installation might fail!${std}"
 	sleep 1
 fi
 
@@ -158,9 +158,9 @@ echo "$INSTALL_DIR"
 
 if [ -d "$INSTALL_DIR" ]
 then
-    	echo "${red}Installation Directory exists. Not Creating this Directory!${std}"
+	echo "${red}Installation Directory exists. Not Creating this Directory!${std}"
 else
-    	echo "${blue}Installation Directory doesn't exist. Creating the Directory!${std}"
+	echo "${blue}Installation Directory doesn't exist. Creating the Directory!${std}"
 	sudo mkdir -p $INSTALL_DIR
 fi
 
@@ -169,9 +169,9 @@ echo "$UC_BAK_DIR"
 
 if [ -d "$UC_BAK_DIR" ]
 then
-    	echo "${red}Backup Directory exists. Not Creating this Directory!${std}"
+	echo "${red}Backup Directory exists. Not Creating this Directory!${std}"
 else
-    	echo "${blue}Backup Directory doesn't exist. Creating the Directory!${std}"
+	echo "${blue}Backup Directory doesn't exist. Creating the Directory!${std}"
 	sudo mkdir -p $UC_BAK_DIR
 fi
 
@@ -185,10 +185,10 @@ echo "${blue}Checking if Git is installed...${std}"
 if hash git 2>/dev/null
 then
 	echo ""
-        echo "${blue}Git is already installed!${std}"
+	echo "${blue}Git is already installed!${std}"
 else
 	echo ""
-        echo "${red}Git is not installed. Installing Git now!${std}"
+	echo "${red}Git is not installed. Installing Git now!${std}"
 	sudo apt-get install git -y
 	sleep 1
 fi
@@ -204,10 +204,10 @@ then
 	if hash dtparam 2>/dev/null
 	then
 		echo ""
-        	echo "${blue}DTParam is already installed!${std}"
+		echo "${blue}DTParam is already installed!${std}"
 	else
 		echo ""
-        	echo "${red}DTParam is not installed. Installing it now!${std}"
+		echo "${red}DTParam is not installed. Installing it now!${std}"
 		sudo apt-get install libraspberrypi-bin -y
 		sleep 1
 	fi
@@ -334,14 +334,14 @@ then
 	echo "${red}Please reboot after the Installation!${std}"
 	echo ""
 	echo "${blue}Purging the Directory now...${std}"
-    	echo "${blue}Installation Complete! Good Bye!${std}"
+	echo "${blue}Installation Complete! Good Bye!${std}"
 	echo ""
-    	sudo rm -d -r "$START_DIR"
+	sudo rm -d -r "$START_DIR"
 else
-    	echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
-    	echo ""
-	echo "${red}Please reboot after the Installation!${std}"
-    	echo "${blue}Installation Complete! Good Bye!${std}"
+	echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
 	echo ""
-    	sudo rm "$START_DIR""/uctronics-lcd-installer"
+	echo "${red}Please reboot after the Installation!${std}"
+	echo "${blue}Installation Complete! Good Bye!${std}"
+	echo ""
+	sudo rm "$START_DIR""/uctronics-lcd-installer"
 fi
