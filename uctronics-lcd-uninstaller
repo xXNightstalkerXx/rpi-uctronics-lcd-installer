@@ -206,8 +206,8 @@ then
 	else
 		echo "${red}Directory doesn't exist! Moving the Backup files to ${TEMP_DIR} instead...${std}"
 		sudo mkdir -p $TEMP_DIR
-		config_temp=$TEMP_DIR"/config.txt"
-		modules_temp=$TEMP_DIR"/modules"
+		config_temp=$TEMP_DIR"/config_uclcd.bak"
+		modules_temp=$TEMP_DIR"/modules_uclcd.bak"
 		sudo mv $CONFIG_BAK $config_temp
 		sudo mv $MODULES_BAK $modules_temp
 		echo ""
