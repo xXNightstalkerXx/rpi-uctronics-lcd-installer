@@ -1,0 +1,289 @@
+#! /bin/bash
+
+#General Directory Declarations
+START_DIR=$PWD
+INSTALL_DIR=/etc/uctronics
+UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
+UC_REPO_DIR=/etc/uctronics/SKU_RM0004
+UC_BAK_DIR=/etc/uctronics/backup
+SCRIPTS_DIR=/usr/bin
+CONFIG=/boot/config.txt
+CONFIG_BAK=/etc/uctronics/backup/config_uclcd.bak
+MODULES=/etc/modules
+MODULES_BAK=/etc/uctronics/backup/modules_uclcd.bak
+UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
+UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
+STARTUP=/usr/bin/uctronics-lcd-startup
+STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
+SYSTEMD=/etc/systemd/system/uctronics-lcd.service
+SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
+
+#URL Declarations
+UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
+INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
+INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
+
+#I2C Interface Setting
+I2C_SETTING=on
+
+#Color Declarations
+std=$(tput setaf 15)
+red=$(tput setaf 9 bold)
+green=$(tput setaf 10 bold)
+yellow=$(tput setaf 11 bold)
+pink=$(tput setaf 57)
+blue=$(tput setaf 27 bold)
+
+#Main Script
+echo ""
+echo ""
+echo "${blue}      ////////////  ////////////  //////   ////////////  ////////////${std}"
+echo "${blue}     //                 //       //   //       //       //          ${std}"
+echo "${blue}    //                 //       //    //      //       //          ${std}"
+echo "${blue}   ////////////       //       /////////     //       ////////////${std}"
+echo "${blue}            //       //       //      //    //                 //${std}"
+echo "${blue}           //       //       //       //   //                 //${std}"
+echo "${blue}////////////       //       //        //  //       ////////////${std}"
+echo "UCTronics Status LCD Installer by Nightstalker"
+echo ""
+echo ""
+echo "${blue}Checking OS...${std}"
+os_type="$(grep -E '^(NAME)=' /etc/os-release)"
+os_type=${os_type#*=}
+
+if [[ "$os_type" == *"Kali"* ]]
+then
+	INSTALL_OPTIONS=1
+	echo ""
+	echo "$os_type"
+elif [[ "$os_type" == *"Raspbian"* ]]
+then
+	if [[ $(cat /boot/issue.txt) == *"stage2"* ]]
+	then
+		INSTALL_OPTIONS=2
+		echo ""
+		echo "$os_type"
+		echo " Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage4"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Lite Version"
+	elif [[ $(cat /boot/issue.txt) == *"stage5"* ]]
+	then
+		INSTALL_OPTIONS=3
+		echo ""
+		echo "$os_type"
+		echo " GUI Full Version"
+	else
+		INSTALL_OPTIONS=2
+		echo ""
+		echo "$os_type"
+		echo " Unknown Raspbian"
+		echo " Using Lite Version Install Options!"
+	fi
+else
+	echo ""
+	echo "${red}Wrong Operating System detected! Aborting the Installation!${std}"
+	sleep 1
+	exit 1
+fi
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/kalipi-blacklist.conf
+elif [[ $INSTALL_OPTIONS -eq 2 ]]
+then
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+elif [[ $INSTALL_OPTIONS -eq 3 ]]
+then
+	#OS Specific Directory Declarations
+	BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+fi
+
+echo ""
+echo "${blue}Operating System okay! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Checking Directories...${std}"
+echo ""
+echo "${blue}Checking Installation Directory...${std}"
+echo "$INSTALL_DIR"
+
+if [ -d "$INSTALL_DIR" ]
+then
+	echo "${red}Installation Directory exists. Not Creating this Directory!${std}"
+else
+	echo "${blue}Installation Directory doesn't exist. Creating the Directory!${std}"
+	sudo mkdir -p $INSTALL_DIR
+fi
+
+echo "${blue}Checking Backup Directory...${std}"
+echo "$UC_BAK_DIR"
+
+if [ -d "$UC_BAK_DIR" ]
+then
+	echo "${red}Backup Directory exists. Not Creating this Directory!${std}"
+else
+	echo "${blue}Backup Directory doesn't exist. Creating the Directory!${std}"
+	sudo mkdir -p $UC_BAK_DIR
+fi
+
+echo ""
+echo "${blue}Directories are okay! Continuing the Installation!${std}"
+sleep 1
+
+if [[ $INSTALL_OPTIONS -eq 1 ]]
+then
+	echo ""
+	echo ""
+	echo "${blue}Checking if DTParam is installed...${std}"
+	if hash dtparam 2>/dev/null
+	then
+		echo ""
+		echo "${blue}DTParam is already installed!${std}"
+	else
+		echo ""
+		echo "${red}DTParam is not installed. Installing it now!${std}"
+		sudo apt-get install libraspberrypi-bin -y
+		sleep 1
+	fi
+	echo ""
+	echo "${blue}DTParam is installed and okay! Continuing Installation!${std}"
+	sleep 1
+fi
+
+echo ""
+echo ""
+echo "${blue}Installing the official UCTronics Repository...${std}"
+echo ""
+echo "${blue}Switching into the Installation Directory...${std}"
+echo "$INSTALL_DIR"
+cd $INSTALL_DIR
+echo "${blue}Downloading the UCTronics Repository...${std}"
+sudo git clone $UC_GIT_URL
+echo ""
+echo "${blue}Installation of the UCTronics Repository completed! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Installing the UCTRONICS-LCD-INSTALLER Repository...${std}"
+echo ""
+echo "${blue}Downloading the UCTRONICS-LCD-INSTALLER Repository...${std}"
+sudo git clone $INSTALLER_GIT_URL
+echo "${blue}Switching into the UCTRONICS-LCD-INSTALLER Directory...${std}"
+echo "$UC_INSTALLER_DIR"
+cd $UC_INSTALLER_DIR
+echo "${blue}Making the UCTRONICS-LCD-INSTALLER Scripts executable...${std}"
+sudo chmod 0755 uctronics-lcd-installer
+sudo chmod 0755 uctronics-lcd-uninstaller
+sudo chmod 0755 uctronics-lcd-startup
+echo "${blue}Copying the uctronics-lcd-uninstaller Script into $SCRIPTS_DIR ...${std}"
+sudo cp $UNINSTALL_BAK $UNINSTALL
+echo "${blue}Copying the uctronics-lcd-startup Script into $SCRIPTS_DIR ...${std}"
+sudo cp $STARTUP_BAK $STARTUP
+echo ""
+echo "${blue}Installation of the UCTRONICS-LCD-INSTALLER Repository completed! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Creating Backups of ${CONFIG} and ${MODULES} ...${std}"
+echo ""
+echo "${blue}Copying ${CONFIG} to ${CONFIG_BAK} ...${std}"
+sudo cp $CONFIG $CONFIG_BAK
+echo "${blue}Copying ${MODULES} to ${MODULES_BAK} ...${std}"
+sudo cp $MODULES $MODULES_BAK
+echo ""
+echo "${blue}Backups created! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Setting up the I2C Interface ...${std}"
+echo ""
+echo "${blue}Changing the I2C dtparam in the ${CONFIG} to ${I2C_SETTING} and adding baudrate settings...${std}"
+echo "dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000"
+sudo sed -i "s/^dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+sudo sed -i "s/^#dtparam=i2c_arm=.*/dtparam=i2c_arm=${I2C_SETTING},i2c_arm_baudrate=400000/" $CONFIG
+echo "${blue}Adjusting ${BLACKLIST} and /etc/modules ...${std}"
+
+if ! [ -e "$BLACKLIST" ]
+then
+	sudo touch "$BLACKLIST"
+fi
+
+sudo sed "$BLACKLIST" -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
+sudo sed /etc/modules -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
+
+if ! grep -q "^i2c[-_]dev" /etc/modules
+then
+	printf "i2c-dev\n" | sudo tee -a /etc/modules > /dev/null
+fi
+
+echo "${blue}Switching the I2C dtparam to ${I2C_SETTING} ...${std}"
+sudo dtparam i2c_arm=$I2C_SETTING
+echo "${blue}Loading the I2C Kernel Module...${std}"
+sudo modprobe i2c-dev
+
+echo ""
+echo "${blue}I2C Interface Setup is completed! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Enabling ON/OFF Switch support...${std}"
+echo ""
+echo "${blue}Adding necessary lines at ${CONFIG} ...${std}"
+echo "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up" | sudo tee -a $CONFIG > /dev/null
+echo ""
+echo "${blue}ON/OFF Switch support enabled! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Configuring the systemd LCD Service for automatic startup...${std}"
+echo ""
+echo "${blue}Copying ${SYSTEMD_BAK} to ${SYSTEMD}...${std}"
+sudo cp $SYSTEMD_BAK $SYSTEMD
+echo "${blue}Reloading the systemd Services...${std}"
+sudo systemctl daemon-reload
+echo "${blue}Starting the LCD Service...${std}"
+sudo systemctl start uctronics-lcd
+echo "${blue}Enabling the LCD Service for automatic startup at boot...${std}"
+sudo systemctl enable uctronics-lcd
+echo ""
+echo "${blue}Systemd Service enabled! Continuing the Installation!${std}"
+sleep 1
+
+echo ""
+echo ""
+echo "${blue}Cleaning up the Installation...${std}"
+echo ""
+echo "${blue}Checking if I'm executed within my GIT Directory...${std}"
+echo "$START_DIR"
+if [[ $START_DIR == *"uctronics-lcd-installer" ]]
+then
+	echo ""
+	echo "${yellow}It seems I'm executed within my GIT Directory.${std}"
+	echo "${yellow}YOU WILL HAVE TO USE 'CD' AFTER I PURGED MY DIRECTORY!${std}"
+	echo "${red}Please reboot after the Installation!${std}"
+	echo ""
+	echo "${blue}Purging the Directory now...${std}"
+	echo "${blue}Installation Complete! Good Bye!${std}"
+	echo ""
+	sudo rm -d -r "$START_DIR"
+else
+	echo "${blue}It seems I'm run as Standalone. Deleting just myself!${std}"
+	echo ""
+	echo "${red}Please reboot after the Installation!${std}"
+	echo "${blue}Installation Complete! Good Bye!${std}"
+	echo ""
+	sudo rm "$START_DIR""/uctronics-lcd-autoinstaller"
+fi
