@@ -55,7 +55,6 @@ Also delete's all associated Files.
 ATTENTION!!</br>
 </br>
 DO NOT install the UCTronics LCD Software with the UCTRONICS-LCD-AUTOINSTALLER and use the UCTRONICS-LCD-INSTALLER instead!!</br>
-</br>
 The UCTRONICS-LCD-AUTOINSTALLER is just meant to be used by my RPI-SETUP-TOOL!</br>
 </br>
 
