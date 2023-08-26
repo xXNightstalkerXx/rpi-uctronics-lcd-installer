@@ -48,6 +48,16 @@ Disables the automatic startup of the Status LCD after boot
     uctronics-lcd-uninstaller
 Will revert all changes to /etc/modules, /boot/config.txt and systemd and switch off the I2C Interface.
 Also delete's all associated Files.
+</br>
+</br>
+</br>
+</br>
+ATTENTION!!</br>
+</br>
+DO NOT install the UCTronics LCD Software with the UCTRONICS-LCD-AUTOINSTALLER and use the UCTRONICS-LCD-INSTALLER instead!!</br>
+</br>
+The UCTRONICS-LCD-AUTOINSTALLER is just meant to be used by my RPI-SETUP-TOOL!</br>
+</br>
 
 ----------------------------------------------------------------
 ----------------------------------------------------------------
