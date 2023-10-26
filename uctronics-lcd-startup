@@ -1,7 +1,6 @@
 #! /bin/bash
 
 #General Directory Declarations
-START_DIR=$PWD
 UC_REPO_DIR=/etc/uctronics/SKU_RM0004
 
 cd $UC_REPO_DIR
