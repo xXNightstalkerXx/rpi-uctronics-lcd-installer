@@ -1,28 +1,16 @@
 #! /bin/bash
 
 #General Directory Declarations
-START_DIR=$PWD
 INSTALL_DIR=/etc/uctronics
-UC_INSTALLER_DIR=/etc/uctronics/uctronics-lcd-installer
-UC_REPO_DIR=/etc/uctronics/SKU_RM0004
-UC_BAK_DIR=/etc/uctronics/backup
 SCRIPTS_DIR=/usr/bin
 CONFIG=/boot/config.txt
 CONFIG_BAK=/etc/uctronics/backup/config_uclcd.bak
 MODULES=/etc/modules
 MODULES_BAK=/etc/uctronics/backup/modules_uclcd.bak
 UNINSTALL=/usr/bin/uctronics-lcd-uninstaller
-UNINSTALL_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-uninstaller
 STARTUP=/usr/bin/uctronics-lcd-startup
-STARTUP_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd-startup
 SYSTEMD=/etc/systemd/system/uctronics-lcd.service
-SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 TEMP_DIR=/tmp/backup
-
-#URL Declarations
-UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
-INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
-INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
 
 #I2C Interface Setting
 I2C_SETTING=off
@@ -31,8 +19,8 @@ I2C_SETTING=off
 std=$(tput setaf 15)
 red=$(tput setaf 9 bold)
 green=$(tput setaf 10 bold)
-yellow=$(tput setaf 11 bold)
-pink=$(tput setaf 57)
+#yellow=$(tput setaf 11 bold)
+#pink=$(tput setaf 57)
 blue=$(tput setaf 27 bold)
 
 #Main Script
