@@ -1,3 +1,4 @@
+## DEPRECIATED (Debian Bullseye)
 # uctronics-lcd-installer
 This Repository has some bash Scripts in it that download and setup the neccessary Files for the UCtronics Rackmount LCD to show status Info.
 The Installer creates a new Directory where this Repository and the UCTronics SKU_RM0004 Repository get downloaded into.
@@ -17,7 +18,7 @@ Also feel free to contribute to this Repository and make it better :)
 ----------------------------------------------------------------
 # INSTALLATION
 
-    wget https://raw.githubusercontent.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
+    wget https://raw.githubusercontent.com/xXNightstalkerXx/uctronics-lcd-installer/Debian_Bullseye/uctronics-lcd-installer
 Download the LCD-Installer Script with wget
 
     sudo chmod 0755 uctronics-lcd-installer

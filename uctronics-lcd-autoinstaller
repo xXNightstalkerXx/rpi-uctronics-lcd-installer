@@ -19,7 +19,7 @@ SYSTEMD=/etc/systemd/system/uctronics-lcd.service
 SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 
 #URL Declarations
-GIT_BRANCH="main"
+GIT_BRANCH="Debian_Bullseye"
 UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
 INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
 
