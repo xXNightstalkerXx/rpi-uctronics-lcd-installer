@@ -20,8 +20,8 @@ SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 
 #URL Declarations
 GIT_BRANCH="Debian_Bullseye"
-UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
-INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
+UC_GIT_URL="https://github.com/UCTRONICS/SKU_RM0004.git"
+INSTALLER_GIT_URL="https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git"
 
 #I2C Interface Setting
 I2C_SETTING=on
