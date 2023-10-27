@@ -19,9 +19,9 @@ SYSTEMD=/etc/systemd/system/uctronics-lcd.service
 SYSTEMD_BAK=/etc/uctronics/uctronics-lcd-installer/uctronics-lcd.service
 
 #URL Declarations
+GIT_BRANCH="main"
 UC_GIT_URL=https://github.com/UCTRONICS/SKU_RM0004.git
 INSTALLER_GIT_URL=https://github.com/xXNightstalkerXx/uctronics-lcd-installer.git
-INSTALLER_WGET_URL=https://raw.github.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
 
 #I2C Interface Setting
 I2C_SETTING=on
@@ -234,7 +234,7 @@ echo ""
 echo "${blue}Installing the UCTRONICS-LCD-INSTALLER Repository...${std}"
 echo ""
 echo "${blue}Downloading the UCTRONICS-LCD-INSTALLER Repository...${std}"
-sudo git clone $INSTALLER_GIT_URL
+sudo git clone -b $GIT_BRANCH $INSTALLER_GIT_URL
 echo "${blue}Switching into the UCTRONICS-LCD-INSTALLER Directory...${std}"
 echo "$UC_INSTALLER_DIR"
 cd $UC_INSTALLER_DIR
