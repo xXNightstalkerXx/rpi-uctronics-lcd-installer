@@ -1,4 +1,5 @@
 # rpi-uctronics-lcd-installer
+
 This Repository has some bash Scripts in it that download and setup the neccessary Files for the UCtronics Rackmount LCD to show status Info.
 The Installer creates a new Directory where this Repository and the UCTronics SKU_RM0004 Repository get downloaded into.
 
@@ -12,9 +13,9 @@ I'm not an expert Coder so use this Repo on your own Risk and don't blame me if 
 If you find something interesting within my Scripts feel free to copy parts of it and implement it into your own code.
 Also feel free to contribute to this Repository and make it better :)
 
+----------------------------------------------------------------
+----------------------------------------------------------------
 
-----------------------------------------------------------------
-----------------------------------------------------------------
 # INSTALLATION
 
     wget https://raw.githubusercontent.com/xXNightstalkerXx/uctronics-lcd-installer/master/uctronics-lcd-installer
@@ -31,6 +32,7 @@ The Installer does the rest of the Job for you now.
 
 ----------------------------------------------------------------
 ----------------------------------------------------------------
+
 # HOW TO USE
 
     sudo systemctl start uctronics-lcd
